@@ -10,10 +10,6 @@
   <!-- ---------------- estilos compartilhados entre login e signup ---------------- -->
   <link rel="stylesheet" href="styles/acesso.css">
 
-  <!-- ---------------------- lógica aplicada no registro -------------------- -->
-  <script src="/scripts/utils.js"></script>
-  <script src="/scripts/signup.js"></script>
-
 </head>
 
 <body>
@@ -22,39 +18,59 @@
     <img src="./assets/pessoa-signup.png" alt="">
   </div>
   <div class="right">
-    <form>
+    <form class="form_cad" action="">
       <div class="form-header">
         <p>To-Do App</p>
       </div>
-
+      <div id="creationstatus" class=""></div>
+      <!-- Campo nome -->
       <label>
         Nome:
-        <input type="text">
+        <input id="cad_name" type="text">
       </label>
+      <span class="errorMsg" id="errorMsg"></span>
+
+      <!-- Campo sobrenome -->
       <label>
         Sobrenome:
-        <input type="text">
+        <input id="cad_secondname" type="text">
       </label>
+      <span class="errorMsg" id="errorMsg"></span>
+
+      <!-- Campo e-mail -->
       <label>
         Email:
-        <input type="email">
+        <input id="cad_email" type="email">
       </label>
+      <span class="errorMsg" id="errorMsg"></span>
+
+
+      <!-- Campo senha -->
       <label>
         Senha:
-        <input type="password">
+        <input id="cad_password" type="password">
       </label>
+      <span class="errorMsg" id="errorMsg"></span>
+
+
+      <!-- Campo confirmar senha -->
       <label>
         Repetir senha:
-        <input type="password">
+        <input id="cad_confirmPassword" type="password">
       </label>
+      <span class="errorMsg" id="errorMsg"></span>
 
-      <button>Criar conta</button>
+
+      <button type="submit" class="submit" id="submit">Criar Conta</button>
 
     </form>
     <div class="ingressar">
       <a href="index.html">Já possui conta? Acesse aqui</a>
     </div>
   </div>
+
+  <!-- ---------------------- lógica aplicada no registro -------------------- -->
+  <script src="./scripts/signup.js"></script>
 
 </body>
 

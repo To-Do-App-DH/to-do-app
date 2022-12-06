@@ -238,6 +238,32 @@ a {
 #skeleton{
   animation: trasparencia 1s infinite;
 }
+.iconsTask{
+  padding: 8px;
+}
+#trash{
+  padding: 4px;
+  cursor: pointer;
+}
+#editar{
+  padding: 4px;
+  cursor: pointer;
+}
+#editar:hover{
+  transform:scale(1.2);
+  -webkit-transform:scale(1.2);
+  -moz-transform:scale(1.2);
+  -ms-transform:scale(1.2);
+  -o-transform:scale(1.2);
+}
+#trash:hover{
+  transform:scale(1.2) ;
+  -webkit-transform:scale(1.2) ;
+  -moz-transform:scale(1.2) ;
+  -ms-transform:scale(1.2) ;
+  -o-transform:scale(1.2) ;
+}
+
 @keyframes trasparencia {
   0%{ opacity: 0.5;}
   100%{ opacity: 0.8;}

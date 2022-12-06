@@ -7,12 +7,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>To-Do App</title>
 
-  <!-- ---------------- estilos compartilhados entre login e signup ---------------- -->
+  <!-- ------------ estilos compartilhados entre login e signup ----------- -->
   <link rel="stylesheet" href="styles/acesso.css">
 
-  <!-- ---------------------- lógica aplicada no login ----------------------- -->
-  <script src="/scripts/utils.js"></script>
-  <script src="/scripts/index.js"></script>
 
 </head>
 
@@ -22,19 +19,23 @@
   </div>
 
   <div class="right">
-    <form>
+    <form class="form_cad">
       <div class="form-header">
         <p>To-Do App</p>
       </div>
+      <div id="creationstatus" class=""></div>
       <h1>Acessar</h1>
       <label>
         Email:
-        <input id="inputEmail" type="email">
+        <input id="inputEmail" type="text">
       </label>
+      <span class="errorMsg" id="errorMsg"></span>
+
       <label>
         Senha:
         <input id="inputPassword" type="password">
       </label>
+      <span class="errorMsg" id="errorMsg"></span>
 
       <button type="submit">Acessar</button>
 
@@ -44,6 +45,8 @@
     </div>
   </div>
 
+  <!-- ------- lógica aplicada no login ------- -->
+  <script src="./scripts/index.js"></script>
 </body>
 
 </html>
