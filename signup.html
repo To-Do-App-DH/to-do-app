@@ -22,43 +22,43 @@
       <div class="form-header">
         <p>To-Do App</p>
       </div>
-      <div id="creationstatus" class=""></div>
+      <div id="creationstatus" class="msgStatus"></div>
       <!-- Campo nome -->
       <label>
         Nome:
-        <input id="cad_name" type="text">
+        <input id="nome" type="text">
+        <span class="errorMsg">Campo vazio ou inválido</span>
       </label>
-      <span class="errorMsg" id="errorMsg"></span>
 
       <!-- Campo sobrenome -->
       <label>
         Sobrenome:
-        <input id="cad_secondname" type="text">
+        <input id="sobrenome" type="text">
+        <span class="errorMsg">Campo vazio ou inválido</span>
       </label>
-      <span class="errorMsg" id="errorMsg"></span>
 
       <!-- Campo e-mail -->
       <label>
         Email:
-        <input id="cad_email" type="email">
+        <input id="email" type="email">
+        <span class="errorMsg">E-mail inválido</span>
       </label>
-      <span class="errorMsg" id="errorMsg"></span>
 
 
       <!-- Campo senha -->
       <label>
         Senha:
-        <input id="cad_password" type="password">
+        <input id="senha" type="password">
+        <span class="errorMsg">Senha inválida</span>
       </label>
-      <span class="errorMsg" id="errorMsg"></span>
 
 
       <!-- Campo confirmar senha -->
       <label>
         Repetir senha:
-        <input id="cad_confirmPassword" type="password">
+        <input id="confirmSenha" type="password">
+        <span class="errorMsg">Senha inválida</span>
       </label>
-      <span class="errorMsg" id="errorMsg"></span>
 
 
       <button type="submit" class="submit" id="submit">Criar Conta</button>
@@ -70,7 +70,7 @@
   </div>
 
   <!-- ---------------------- lógica aplicada no registro -------------------- -->
-  <script src="./scripts/signup.js"></script>
+  <script src="./scripts/signup.js" type="module"></script>
 
 </body>
 
