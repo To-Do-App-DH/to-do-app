@@ -10,10 +10,6 @@
   <!-- ---------------- estilos compartilhados entre login e signup ---------------- -->
   <link rel="stylesheet" href="styles/acesso.css">
 
-  <!-- ---------------------- lógica aplicada no registro -------------------- -->
-  <script src="/scripts/utils.js"></script>
-  <script src="/scripts/signup.js"></script>
-
 </head>
 
 <body>
@@ -22,39 +18,59 @@
     <img src="./assets/pessoa-signup.png" alt="">
   </div>
   <div class="right">
-    <form>
+    <form class="form_cad" action="">
       <div class="form-header">
         <p>To-Do App</p>
       </div>
-
+      <div id="creationstatus" class="msgStatus"></div>
+      <!-- Campo nome -->
       <label>
         Nome:
-        <input type="text">
-      </label>
-      <label>
-        Sobrenome:
-        <input type="text">
-      </label>
-      <label>
-        Email:
-        <input type="email">
-      </label>
-      <label>
-        Senha:
-        <input type="password">
-      </label>
-      <label>
-        Repetir senha:
-        <input type="password">
+        <input id="nome" type="text">
+        <span class="errorMsg">Campo vazio ou inválido</span>
       </label>
 
-      <button>Criar conta</button>
+      <!-- Campo sobrenome -->
+      <label>
+        Sobrenome:
+        <input id="sobrenome" type="text">
+        <span class="errorMsg">Campo vazio ou inválido</span>
+      </label>
+
+      <!-- Campo e-mail -->
+      <label>
+        Email:
+        <input id="email" type="email">
+        <span class="errorMsg">E-mail inválido</span>
+      </label>
+
+
+      <!-- Campo senha -->
+      <label>
+        Senha:
+        <input id="senha" type="password">
+        <span class="errorMsg">Senha inválida</span>
+      </label>
+
+
+      <!-- Campo confirmar senha -->
+      <label>
+        Repetir senha:
+        <input id="confirmSenha" type="password">
+        <span class="errorMsg">Senha inválida</span>
+      </label>
+
+
+      <button type="submit" class="submit" id="submit">Criar Conta</button>
 
     </form>
     <div class="ingressar">
       <a href="index.html">Já possui conta? Acesse aqui</a>
     </div>
   </div>
+
+  <!-- ---------------------- lógica aplicada no registro -------------------- -->
+  <script src="./scripts/signup.js" type="module"></script>
 
 </body>
 
