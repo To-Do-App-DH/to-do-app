@@ -34,7 +34,7 @@ function ocultarSpinner() {
     const form = document.querySelector("form");
     
     // Selecionamos o spinner
-    const spinnerContainer = document.querySelector("#conteiner-load");
+    const spinnerContainer = document.querySelector("#container-load");
     
     // Removemos o spinner do HTML
     body.removeChild(spinnerContainer);
