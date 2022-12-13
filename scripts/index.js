@@ -1,3 +1,4 @@
+import { mostrarSpinner, ocultarSpinner } from './loaders.js';
 import { estaLogado, logar } from './login.js';
 import {
   adicionarValidacao,
@@ -34,6 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
 
+    mostrarSpinner();
+
     if (!formEstaValido(formValido)) return;
 
     const config = {
@@ -60,14 +63,16 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!login.ok) throw new Error(login);
 
       const res = await login.json();
-
       logar(res.jwt);
+      ocultarSpinner();
+
     } catch (err) {
       const errors =
         err.status !== 500 ? 'Login e/ou Senha inválidos' : 'Erro interno';
       loginStatus.innerText = errors;
       loginStatus.style.display = 'block';
       submit.disabled = false;
+      ocultarSpinner();
     }
   });
 });

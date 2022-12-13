@@ -1,5 +1,7 @@
-import { logar } from "./login.js";
+
 import { adicionarValidacao, desabilitarBotao, formEstaValido, mostrarErro } from "./utils.js";
+import { mostrarSpinner, ocultarSpinner } from "./loaders.js";
+import { logar } from "./login.js";
 
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.querySelector(".form_cad");
@@ -72,6 +74,8 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
 
+    mostrarSpinner();
+
     if (!formEstaValido(formularioValido)) return;
 
     status.style.display = "none";
@@ -95,15 +99,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const resposta = await cadastrado.json();
       logar(resposta.jwt);
-      
+      ocultarSpinner();
+
     } catch (error) {
       if (error.message === "400") {
         status.innerText = "Usuário já cadastrado.";
         status.style.display = "block";
+        ocultarSpinner();
         return;
       }
       status.innerText = "Erro ao tentar criar o usuário, tente novamente.";
       status.style.display = "block";
-    }
+      ocultarSpinner();
+    } 
   })
 })
