@@ -100,12 +100,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (error.message === "400") {
         status.innerText = "Usuário já cadastrado.";
         status.style.display = "block";
-        //ocultarSpinner();
         return;
       }
       status.innerText = "Erro ao tentar criar o usuário, tente novamente.";
       status.style.display = "block";
-      //ocultarSpinner();
-    }
+    } 
   })
 })
