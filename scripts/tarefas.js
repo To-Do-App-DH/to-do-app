@@ -3,6 +3,9 @@ import {
   adicionarValidacao,
   desabilitarBotao,
   formEstaValido,
+  notificaoErro,
+  renderizarSkeletons,
+  removerSkeleton
 } from './utils.js';
 
 const token = getToken();
@@ -12,7 +15,7 @@ const defaultHeader = {
   'Content-Type': 'application/json',
   Authorization: token,
 };
-document.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('load', () => {
   const formularioValido = {
     inputTarefa: false,
   };
@@ -21,17 +24,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('formularioTarefa');
   const btnSair = document.getElementById('closeApp');
   const nomeUser = document.getElementById("nomeUser");
+  renderizarSkeletons(3,".tarefas-pendentes")
 
   async function perfilUser() {
-    const resposta = await fetch("http://todo-api.ctd.academy:3000/v1/users/getme", {
-      headers: defaultHeader,
-    });
-    if (!resposta.ok) {
-      console.log('erro');
-      return;
+    try {
+      const resposta = await fetch("http://todo-api.ctd.academy:3000/v1/users/getme", {
+        headers: defaultHeader,
+      });
+      if (!resposta.ok) {
+        throw new Error()
+      }
+      const perfil = await resposta.json();
+      nomeUser.innerText = `${perfil.firstName} ${perfil.lastName}`
+    } catch {
+      notificaoErro();
     }
-    const perfil = await resposta.json();
-    nomeUser.innerText = `${perfil.firstName} ${perfil.lastName}`
   }
 
   perfilUser();
@@ -55,96 +62,109 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   const carregarTarefas = async () => {
-    const res = await fetch('http://todo-api.ctd.academy:3000/v1/tasks', {
-      headers: defaultHeader,
-    });
-    if (!res.ok) {
-      console.log('erro');
-      return;
-    }
+    try {
+      const res = await fetch('http://todo-api.ctd.academy:3000/v1/tasks', {
+        headers: defaultHeader,
+      });
+      if (!res.ok) {
+        throw new Error()
+      }
 
-    const data = await res.json();
-    tarefas = data;
-    renderizarTarefas();
+      const data = await res.json();
+      tarefas = data;
+      renderizarTarefas();
+    } catch {
+      notificaoErro();
+    }
   };
 
   carregarTarefas();
 });
 
 async function criarTarefa(description, completed, form) {
-  const criarTarefa = await fetch('http://todo-api.ctd.academy:3000/v1/tasks', {
-    method: 'POST',
-    headers: defaultHeader,
-    body: JSON.stringify({
-      description,
-      completed,
-    }),
-  });
+  try {
+    const criarTarefa = await fetch('http://todo-api.ctd.academy:3000/v1/tasks', {
+      method: 'POST',
+      headers: defaultHeader,
+      body: JSON.stringify({
+        description,
+        completed,
+      }),
+    });
 
-  if (!criarTarefa.ok) {
-    console.log('erro');
-    return;
+    if (!criarTarefa.ok) {
+      throw new Error()
+    }
+
+    const data = await criarTarefa.json();
+    tarefas = [...tarefas, data];
+    renderizarTarefas();
+    form.reset();
+  } catch {
+    notificaoErro();
   }
-
-  const data = await criarTarefa.json();
-  tarefas = [...tarefas, data];
-  renderizarTarefas();
-  form.reset();
 }
 
 async function deletarTarefa(id) {
-  const deletarTarefa = await fetch(
-    `http://todo-api.ctd.academy:3000/v1/tasks/${id}`,
-    {
-      method: 'DELETE',
-      headers: defaultHeader,
+  try {
+    const deletarTarefa = await fetch(
+      `http://todo-api.ctd.academy:3000/v1/tasks/${id}`,
+      {
+        method: 'DELETE',
+        headers: defaultHeader,
+      }
+    );
+
+    if (!deletarTarefa.ok) {
+      throw new Error()
     }
-  );
 
-  if (!deletarTarefa.ok) {
-    console.log('Erro ao deletar');
-    return;
+    Swal.fire({
+      icon: 'success',
+      title: 'Apagado',
+      showConfirmButton: false,
+      timer: 1500
+    })
+
+    tarefas = tarefas.filter((tarefa) => tarefa.id !== id);
+    renderizarTarefas();
+  } catch {
+    notificaoErro();
   }
-
-  Swal.fire({
-    icon: 'success',
-    title: 'Apagado',
-    showConfirmButton: false,
-    timer: 1500
-  })
-
-  tarefas = tarefas.filter((tarefa) => tarefa.id !== id);
-  renderizarTarefas();
 }
 
-async function editarTarefa(id, dadosTarefa) {
-  const editarTarefa = await fetch(
-    `http://todo-api.ctd.academy:3000/v1/tasks/${id}`,
-    {
-      method: 'PUT',
-      headers: defaultHeader,
-      body: JSON.stringify(dadosTarefa),
+async function editarTarefa(id, dadosTarefa, mostrarSucesso) {
+  try {
+    const editarTarefa = await fetch(
+      `http://todo-api.ctd.academy:3000/v1/tasks/${id}`,
+      {
+        method: 'PUT',
+        headers: defaultHeader,
+        body: JSON.stringify(dadosTarefa),
+      }
+    );
+
+    if (!editarTarefa.ok) {
+      throw new Error()
     }
-  );
+    if (mostrarSucesso) {
+      Swal.fire({
+        icon: 'success',
+        title: 'Salvo!',
+        showConfirmButton: false,
+        timer: 1500
+      })  
+    }
 
-  if (!editarTarefa.ok) {
-    console.log('erro');
-    return;
+    tarefas = tarefas.map((tarefa) => {
+      if (tarefa.id !== id) return tarefa;
+      return { ...tarefa, ...dadosTarefa };
+    });
+
+    renderizarTarefas();
+  } catch {
+    notificaoErro();
   }
-
-  Swal.fire({
-    icon: 'success',
-    title: 'Salvo!',
-    showConfirmButton: false,
-    timer: 1500
-  })
-
-  tarefas = tarefas.map((tarefa) => {
-    if (tarefa.id !== id) return tarefa;
-    return { ...tarefa, ...dadosTarefa };
-  });
-
-  renderizarTarefas();
 }
 
 function renderizarTarefas() {
@@ -207,7 +227,7 @@ function renderizarListaTarefas(tarefas, lista) {
         showCancelButton: true,
         cancelButtonText: "Cancelar",
         confirmButtonText: 'Salvar',
-        preConfirm: (descricao) =>{
+        preConfirm: (descricao) => {
           if (descricao.trim().length < 6) {
             Swal.showValidationMessage(
               `Obrigatório informar descrição da tarefa`)
@@ -215,12 +235,12 @@ function renderizarListaTarefas(tarefas, lista) {
             return descricao;
           }
         }
-      }).then((result)=>{
+      }).then((result) => {
         if (result.isConfirmed) {
           editarTarefa(tarefa.id, {
             description: result.value
-          }) 
-          
+          }, true)
+
         }
       })
     });
