@@ -25,10 +25,10 @@ document.addEventListener('DOMContentLoaded', () => {
   async function perfilUser() {
     const resposta = await fetch("http://todo-api.ctd.academy:3000/v1/users/getme", {
       headers: defaultHeader,
-    }); 
+    });
     if (!resposta.ok) {
       console.log('erro');
-      return;  
+      return;
     }
     const perfil = await resposta.json();
     nomeUser.innerText = `${perfil.firstName} ${perfil.lastName}`
@@ -39,6 +39,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   adicionarValidacao(formularioValido, btnCriar, inputTarefa, 'inputTarefa', {
     vazio: true,
+    trim: true,
+    removerEspacosDuplicados: true,
+    tamanhoMin: 6
   });
 
   desabilitarBotao(formularioValido, btnCriar);
@@ -103,6 +106,13 @@ async function deletarTarefa(id) {
     return;
   }
 
+  Swal.fire({
+    icon: 'success',
+    title: 'Apagado',
+    showConfirmButton: false,
+    timer: 1500
+  })
+
   tarefas = tarefas.filter((tarefa) => tarefa.id !== id);
   renderizarTarefas();
 }
@@ -121,6 +131,13 @@ async function editarTarefa(id, dadosTarefa) {
     console.log('erro');
     return;
   }
+
+  Swal.fire({
+    icon: 'success',
+    title: 'Salvo!',
+    showConfirmButton: false,
+    timer: 1500
+  })
 
   tarefas = tarefas.map((tarefa) => {
     if (tarefa.id !== id) return tarefa;
@@ -164,12 +181,49 @@ function renderizarListaTarefas(tarefas, lista) {
 
     const btnDeletar = document.createElement('button');
     btnDeletar.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
-    btnDeletar.addEventListener('click', () => deletarTarefa(tarefa.id));
+    btnDeletar.addEventListener('click', () => {
+      Swal.fire({
+        title: `Tem certeza que deseja apagar a tarefa: <u>${tarefa.description}</u>`,
+        showCancelButton: true,
+        confirmButtonText: 'Apagar',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          deletarTarefa(tarefa.id)
+        }
+      })
+    });
 
     const btnEditar = document.createElement('button');
     btnEditar.innerHTML =
       '<i class="fa-regular fa-pen-to-square" id="editar"></i>';
-    btnEditar.addEventListener('click', () => console.log('editar'));
+    btnEditar.addEventListener('click', () => {
+      Swal.fire({
+        title: 'Editar tarefa',
+        input: 'text',
+        inputAttributes: {
+          autocapitalize: 'off'
+        },
+        inputValue: tarefa.description,
+        showCancelButton: true,
+        cancelButtonText: "Cancelar",
+        confirmButtonText: 'Salvar',
+        preConfirm: (descricao) =>{
+          if (descricao.trim().length < 6) {
+            Swal.showValidationMessage(
+              `Obrigatório informar descrição da tarefa`)
+          } else {
+            return descricao;
+          }
+        }
+      }).then((result)=>{
+        if (result.isConfirmed) {
+          editarTarefa(tarefa.id, {
+            description: result.value
+          }) 
+          
+        }
+      })
+    });
 
     const acoesTask = document.createElement('div');
     acoesTask.classList.add('iconsTask');
@@ -187,138 +241,3 @@ function renderizarListaTarefas(tarefas, lista) {
   lista.innerHTML = '';
   lista.appendChild(render);
 }
-
-// let gerarListaTarefas = (params) => {
-//   tarefasPendentes.innerHTML += `
-//     <li class="tarefa">
-//         <div id="btnFeito" class="not-done"></div>
-//         <div class="descricao">
-//             <p class="nomeTarefa">${params}</p>
-//             <p class="timestamp">Criada em: ${time}</p>
-//         </div>
-//         <div class="iconsTask">
-//         <i class="fa-solid fa-trash-can" id="trash"></i>
-//         <i class="fa-regular fa-pen-to-square" id="editar"></i>
-//         </div>
-//     </li>`;
-// };
-
-// // ______ codigos API ________
-// const getTasksAll = () => {
-//   fetch('http://todo-api.ctd.academy:3000/v1/tasks', {
-//     method: 'GET',
-//     headers: {
-//       Accept: '/ , application/json',
-//       'Content-Type': 'application/json',
-//       authorization: `${token}`,
-//     },
-//   }).then((res) => {
-//     if (res.status == 200) {
-//       res.json().then((data) => {
-//         console.log(data);
-//         for (let i = 0; i < data.length; i++) {
-//           gerarListaTarefas(data[i].description);
-//         }
-//         trash = document.querySelectorAll('#trash');
-//         trash.forEach((ele, i) => {
-//           ele.addEventListener('click', () => {
-//             delTasks(data[i].id);
-//           });
-//         });
-//         // adicionar funcionalidade ao botão editar e conclusao da tarefa
-//         pen = document.querySelectorAll('#editar');
-//         pen.forEach((ele, i) => {
-//           ele.addEventListener('click', () => {
-//             editTasks(data[i].id);
-//           });
-//         });
-//         check = document.querySelectorAll('#btnFeito');
-//         let nomeTarefa = document.querySelectorAll('.nomeTarefa');
-//         check.forEach((ele) => {
-//           ele.addEventListener('click', () => {
-//             nomeTarefa.forEach((ele) => {
-//               ele.classList.toggle('feito');
-//             });
-//           });
-//         });
-//       });
-//     }
-//   });
-// };
-
-// getTasksAll();
-
-// const getTasksOne = () => {
-//   fetch(`http://todo-api.ctd.academy:3000/v1/tasks/${getIdTasks}`, {
-//     method: 'GET',
-//     headers: {
-//       Accept: '/ , application/json',
-//       'Content-Type': 'application/json',
-//       authorization: `${token}`,
-//     },
-//   }).then((res) => {
-//     if (res.status == 200) {
-//       res.json().then((data) => {
-//         console.log(data);
-//       });
-//     }
-//   });
-// };
-
-// const postTasks = () => {
-//   fetch('http://todo-api.ctd.academy:3000/v1/tasks', {
-//     method: 'POST',
-//     headers: {
-//       Accept: '/ , application/json',
-//       'Content-Type': 'application/json',
-//       authorization: `${token}`,
-//     },
-//     body: JSON.stringify({
-//       description: `${inputTarefa.value}`,
-//       completed: false,
-//     }),
-//   }).then((res) => {
-//     console.log(res.status);
-//     if (res.status == 201) {
-//       getTasksAll();
-//       window.location.href = 'tarefas.html';
-//     }
-//   });
-// };
-
-// const delTasks = (params) => {
-//   fetch(`http://todo-api.ctd.academy:3000/v1/tasks/${params}`, {
-//     method: 'DELETE',
-//     headers: {
-//       Accept: '/ , application/json',
-//       'Content-Type': 'application/json',
-//       authorization: `${token}`,
-//     },
-//   }).then((res) => {
-//     console.log(res.status);
-//     if (res.status == 200) {
-//       getTasksAll();
-//       window.location.href = 'tarefas.html';
-//     }
-//   });
-// };
-
-// const editTasks = (params) => {
-//   fetch(`http://todo-api.ctd.academy:3000/v1/tasks/${params}`, {
-//     method: 'PUT',
-//     headers: {
-//       Accept: '/ , application/json',
-//       'Content-Type': 'application/json',
-//       authorization: `${token}`,
-//     },
-//     body: JSON.stringify({
-//       description: `${inputTarefa.value}`,
-//       completed: false,
-//     }),
-//   }).then((res) => {
-//     if (res.status == 200) {
-//       getTasksAll();
-//       window.location.href = 'tarefas.html';
-//     }
-//   });
-// };

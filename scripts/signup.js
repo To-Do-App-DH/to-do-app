@@ -21,22 +21,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
   adicionarValidacao(formularioValido, submit, nome, 'nome', {
     removerEspacosDuplicados: true,
-    vazio: true
+    vazio: true,
+    trim:true
   });
 
   adicionarValidacao(formularioValido, submit, sobrenome, 'sobrenome', {
     removerEspacosDuplicados: true,
-    vazio: true
+    vazio: true,
+    trim: true
   });
 
   adicionarValidacao(formularioValido, submit, email, 'email', {
-    removerEspacosDuplicados: true,
+    removerEspacos: true,
     vazio: true,
-    email: true
+    email: true,
   });
 
   adicionarValidacao(formularioValido, submit, password, 'senha', {
-    vazio: true
+    vazio: true,
+    tamanhoMin: 6
   }, () => {
     if (!password.value || !confirmPassword.value) {
       return false;
@@ -50,7 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   adicionarValidacao(formularioValido, submit, confirmPassword, 'confirmSenha', {
-    vazio: true
+    vazio: true,
+    tamanhoMin: 6
   }, () => {
     if (!password.value || !confirmPassword.value) {
       return false;

@@ -23,20 +23,31 @@ function adicionarValidacao(
     if (validacoes.removerEspacosDuplicados)
       el.value = semEspacos(event.target.value, ' ');
     const email = validacoes.email ? emailValido(event.target.value) : true;
+    const tamanhoMin = validacoes.tamanhoMin ? event.target.value.length >= validacoes.tamanhoMin : true;
     const naoVazio = validacoes.vazio
       ? estaPreenchido(event.target.value)
       : true;
     const callbackPersonalizada = callback ? callback() : true;
 
-    formularioValido[campoValidacao] = email && naoVazio && callbackPersonalizada;
+    formularioValido[campoValidacao] = email && naoVazio && callbackPersonalizada && tamanhoMin;
 
     desabilitarBotao(formularioValido, btnSubmit);
     mostrarErro(formularioValido, el, campoValidacao);
   };
 
+  if (validacoes.trim) {
+    el.addEventListener('change', (event)=>{
+      event.target.value = event.target.value.trim();
+      desabilitarBotao(formularioValido, btnSubmit);
+      mostrarErro(formularioValido, el, campoValidacao);
+    });
+  }
+
   el.addEventListener('keyup', validacao);
-  el.addEventListener('blur', validacao);
+  el.addEventListener('change', validacao);
+
 }
+
 
 function desabilitarBotao(formularioValido, btnSubmit) {
   btnSubmit.disabled = !formEstaValido(formularioValido);
