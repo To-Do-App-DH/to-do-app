@@ -42,7 +42,21 @@ window.addEventListener('load', () => {
   }
 
   perfilUser();
-  btnSair.addEventListener('click', () => deslogar());
+  btnSair.addEventListener('click', () => {
+    Swal.fire({
+      title: 'Deseja sair?',
+      text: "Você tem certeza que deseja sair?",
+      icon: 'warning',
+      showCancelButton: true,
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sair',
+      cancelButtonText: "Cancelar"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deslogar()
+      }
+    })
+  });
 
   adicionarValidacao(formularioValido, btnCriar, inputTarefa, 'inputTarefa', {
     vazio: true,
