@@ -3,6 +3,9 @@ import {
   adicionarValidacao,
   desabilitarBotao,
   formEstaValido,
+  notificaoErro,
+  renderizarSkeletons,
+  removerSkeleton
 } from './utils.js';
 
 const token = getToken();
@@ -12,7 +15,7 @@ const defaultHeader = {
   'Content-Type': 'application/json',
   Authorization: token,
 };
-document.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('load', () => {
   const formularioValido = {
     inputTarefa: false,
   };
@@ -21,24 +24,45 @@ document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('formularioTarefa');
   const btnSair = document.getElementById('closeApp');
   const nomeUser = document.getElementById("nomeUser");
+  renderizarSkeletons(3,".tarefas-pendentes")
 
   async function perfilUser() {
-    const resposta = await fetch("http://todo-api.ctd.academy:3000/v1/users/getme", {
-      headers: defaultHeader,
-    }); 
-    if (!resposta.ok) {
-      console.log('erro');
-      return;  
+    try {
+      const resposta = await fetch("http://todo-api.ctd.academy:3000/v1/users/getme", {
+        headers: defaultHeader,
+      });
+      if (!resposta.ok) {
+        throw new Error()
+      }
+      const perfil = await resposta.json();
+      nomeUser.innerText = `${perfil.firstName} ${perfil.lastName}`
+    } catch {
+      notificaoErro();
     }
-    const perfil = await resposta.json();
-    nomeUser.innerText = `${perfil.firstName} ${perfil.lastName}`
   }
 
   perfilUser();
-  btnSair.addEventListener('click', () => deslogar());
+  btnSair.addEventListener('click', () => {
+    Swal.fire({
+      title: 'Deseja sair?',
+      text: "Você tem certeza que deseja sair?",
+      icon: 'warning',
+      showCancelButton: true,
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sair',
+      cancelButtonText: "Cancelar"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deslogar()
+      }
+    })
+  });
 
   adicionarValidacao(formularioValido, btnCriar, inputTarefa, 'inputTarefa', {
     vazio: true,
+    trim: true,
+    removerEspacosDuplicados: true,
+    tamanhoMin: 6
   });
 
   desabilitarBotao(formularioValido, btnCriar);
@@ -52,82 +76,109 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   const carregarTarefas = async () => {
-    const res = await fetch('http://todo-api.ctd.academy:3000/v1/tasks', {
-      headers: defaultHeader,
-    });
-    if (!res.ok) {
-      console.log('erro');
-      return;
-    }
+    try {
+      const res = await fetch('http://todo-api.ctd.academy:3000/v1/tasks', {
+        headers: defaultHeader,
+      });
+      if (!res.ok) {
+        throw new Error()
+      }
 
-    const data = await res.json();
-    tarefas = data;
-    renderizarTarefas();
+      const data = await res.json();
+      tarefas = data;
+      renderizarTarefas();
+    } catch {
+      notificaoErro();
+    }
   };
 
   carregarTarefas();
 });
 
 async function criarTarefa(description, completed, form) {
-  const criarTarefa = await fetch('http://todo-api.ctd.academy:3000/v1/tasks', {
-    method: 'POST',
-    headers: defaultHeader,
-    body: JSON.stringify({
-      description,
-      completed,
-    }),
-  });
+  try {
+    const criarTarefa = await fetch('http://todo-api.ctd.academy:3000/v1/tasks', {
+      method: 'POST',
+      headers: defaultHeader,
+      body: JSON.stringify({
+        description,
+        completed,
+      }),
+    });
 
-  if (!criarTarefa.ok) {
-    console.log('erro');
-    return;
+    if (!criarTarefa.ok) {
+      throw new Error()
+    }
+
+    const data = await criarTarefa.json();
+    tarefas = [...tarefas, data];
+    renderizarTarefas();
+    form.reset();
+  } catch {
+    notificaoErro();
   }
-
-  const data = await criarTarefa.json();
-  tarefas = [...tarefas, data];
-  renderizarTarefas();
-  form.reset();
 }
 
 async function deletarTarefa(id) {
-  const deletarTarefa = await fetch(
-    `http://todo-api.ctd.academy:3000/v1/tasks/${id}`,
-    {
-      method: 'DELETE',
-      headers: defaultHeader,
+  try {
+    const deletarTarefa = await fetch(
+      `http://todo-api.ctd.academy:3000/v1/tasks/${id}`,
+      {
+        method: 'DELETE',
+        headers: defaultHeader,
+      }
+    );
+
+    if (!deletarTarefa.ok) {
+      throw new Error()
     }
-  );
 
-  if (!deletarTarefa.ok) {
-    console.log('Erro ao deletar');
-    return;
+    Swal.fire({
+      icon: 'success',
+      title: 'Apagado',
+      showConfirmButton: false,
+      timer: 1500
+    })
+
+    tarefas = tarefas.filter((tarefa) => tarefa.id !== id);
+    renderizarTarefas();
+  } catch {
+    notificaoErro();
   }
-
-  tarefas = tarefas.filter((tarefa) => tarefa.id !== id);
-  renderizarTarefas();
 }
 
-async function editarTarefa(id, dadosTarefa) {
-  const editarTarefa = await fetch(
-    `http://todo-api.ctd.academy:3000/v1/tasks/${id}`,
-    {
-      method: 'PUT',
-      headers: defaultHeader,
-      body: JSON.stringify(dadosTarefa),
+async function editarTarefa(id, dadosTarefa, mostrarSucesso) {
+  try {
+    const editarTarefa = await fetch(
+      `http://todo-api.ctd.academy:3000/v1/tasks/${id}`,
+      {
+        method: 'PUT',
+        headers: defaultHeader,
+        body: JSON.stringify(dadosTarefa),
+      }
+    );
+
+    if (!editarTarefa.ok) {
+      throw new Error()
     }
-  );
+    if (mostrarSucesso) {
+      Swal.fire({
+        icon: 'success',
+        title: 'Salvo!',
+        showConfirmButton: false,
+        timer: 1500
+      })  
+    }
 
-  if (!editarTarefa.ok) {
-    console.log('erro');
-    return;
+    tarefas = tarefas.map((tarefa) => {
+      if (tarefa.id !== id) return tarefa;
+      return { ...tarefa, ...dadosTarefa };
+    });
+
+    renderizarTarefas();
+  } catch {
+    notificaoErro();
   }
-
-  tarefas = tarefas.map((tarefa) => {
-    if (tarefa.id !== id) return tarefa;
-    return { ...tarefa, ...dadosTarefa };
-  });
-
-  renderizarTarefas();
 }
 
 function renderizarTarefas() {
@@ -164,12 +215,49 @@ function renderizarListaTarefas(tarefas, lista) {
 
     const btnDeletar = document.createElement('button');
     btnDeletar.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
-    btnDeletar.addEventListener('click', () => deletarTarefa(tarefa.id));
+    btnDeletar.addEventListener('click', () => {
+      Swal.fire({
+        title: `Tem certeza que deseja apagar a tarefa: <u>${tarefa.description}</u>`,
+        showCancelButton: true,
+        confirmButtonText: 'Apagar',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          deletarTarefa(tarefa.id)
+        }
+      })
+    });
 
     const btnEditar = document.createElement('button');
     btnEditar.innerHTML =
       '<i class="fa-regular fa-pen-to-square" id="editar"></i>';
-    btnEditar.addEventListener('click', () => console.log('editar'));
+    btnEditar.addEventListener('click', () => {
+      Swal.fire({
+        title: 'Editar tarefa',
+        input: 'text',
+        inputAttributes: {
+          autocapitalize: 'off'
+        },
+        inputValue: tarefa.description,
+        showCancelButton: true,
+        cancelButtonText: "Cancelar",
+        confirmButtonText: 'Salvar',
+        preConfirm: (descricao) => {
+          if (descricao.trim().length < 6) {
+            Swal.showValidationMessage(
+              `Obrigatório informar descrição da tarefa`)
+          } else {
+            return descricao;
+          }
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          editarTarefa(tarefa.id, {
+            description: result.value
+          }, true)
+
+        }
+      })
+    });
 
     const acoesTask = document.createElement('div');
     acoesTask.classList.add('iconsTask');
@@ -187,138 +275,3 @@ function renderizarListaTarefas(tarefas, lista) {
   lista.innerHTML = '';
   lista.appendChild(render);
 }
-
-// let gerarListaTarefas = (params) => {
-//   tarefasPendentes.innerHTML += `
-//     <li class="tarefa">
-//         <div id="btnFeito" class="not-done"></div>
-//         <div class="descricao">
-//             <p class="nomeTarefa">${params}</p>
-//             <p class="timestamp">Criada em: ${time}</p>
-//         </div>
-//         <div class="iconsTask">
-//         <i class="fa-solid fa-trash-can" id="trash"></i>
-//         <i class="fa-regular fa-pen-to-square" id="editar"></i>
-//         </div>
-//     </li>`;
-// };
-
-// // ______ codigos API ________
-// const getTasksAll = () => {
-//   fetch('http://todo-api.ctd.academy:3000/v1/tasks', {
-//     method: 'GET',
-//     headers: {
-//       Accept: '/ , application/json',
-//       'Content-Type': 'application/json',
-//       authorization: `${token}`,
-//     },
-//   }).then((res) => {
-//     if (res.status == 200) {
-//       res.json().then((data) => {
-//         console.log(data);
-//         for (let i = 0; i < data.length; i++) {
-//           gerarListaTarefas(data[i].description);
-//         }
-//         trash = document.querySelectorAll('#trash');
-//         trash.forEach((ele, i) => {
-//           ele.addEventListener('click', () => {
-//             delTasks(data[i].id);
-//           });
-//         });
-//         // adicionar funcionalidade ao botão editar e conclusao da tarefa
-//         pen = document.querySelectorAll('#editar');
-//         pen.forEach((ele, i) => {
-//           ele.addEventListener('click', () => {
-//             editTasks(data[i].id);
-//           });
-//         });
-//         check = document.querySelectorAll('#btnFeito');
-//         let nomeTarefa = document.querySelectorAll('.nomeTarefa');
-//         check.forEach((ele) => {
-//           ele.addEventListener('click', () => {
-//             nomeTarefa.forEach((ele) => {
-//               ele.classList.toggle('feito');
-//             });
-//           });
-//         });
-//       });
-//     }
-//   });
-// };
-
-// getTasksAll();
-
-// const getTasksOne = () => {
-//   fetch(`http://todo-api.ctd.academy:3000/v1/tasks/${getIdTasks}`, {
-//     method: 'GET',
-//     headers: {
-//       Accept: '/ , application/json',
-//       'Content-Type': 'application/json',
-//       authorization: `${token}`,
-//     },
-//   }).then((res) => {
-//     if (res.status == 200) {
-//       res.json().then((data) => {
-//         console.log(data);
-//       });
-//     }
-//   });
-// };
-
-// const postTasks = () => {
-//   fetch('http://todo-api.ctd.academy:3000/v1/tasks', {
-//     method: 'POST',
-//     headers: {
-//       Accept: '/ , application/json',
-//       'Content-Type': 'application/json',
-//       authorization: `${token}`,
-//     },
-//     body: JSON.stringify({
-//       description: `${inputTarefa.value}`,
-//       completed: false,
-//     }),
-//   }).then((res) => {
-//     console.log(res.status);
-//     if (res.status == 201) {
-//       getTasksAll();
-//       window.location.href = 'tarefas.html';
-//     }
-//   });
-// };
-
-// const delTasks = (params) => {
-//   fetch(`http://todo-api.ctd.academy:3000/v1/tasks/${params}`, {
-//     method: 'DELETE',
-//     headers: {
-//       Accept: '/ , application/json',
-//       'Content-Type': 'application/json',
-//       authorization: `${token}`,
-//     },
-//   }).then((res) => {
-//     console.log(res.status);
-//     if (res.status == 200) {
-//       getTasksAll();
-//       window.location.href = 'tarefas.html';
-//     }
-//   });
-// };
-
-// const editTasks = (params) => {
-//   fetch(`http://todo-api.ctd.academy:3000/v1/tasks/${params}`, {
-//     method: 'PUT',
-//     headers: {
-//       Accept: '/ , application/json',
-//       'Content-Type': 'application/json',
-//       authorization: `${token}`,
-//     },
-//     body: JSON.stringify({
-//       description: `${inputTarefa.value}`,
-//       completed: false,
-//     }),
-//   }).then((res) => {
-//     if (res.status == 200) {
-//       getTasksAll();
-//       window.location.href = 'tarefas.html';
-//     }
-//   });
-// };

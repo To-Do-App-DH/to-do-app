@@ -16,7 +16,6 @@
     crossorigin="anonymous" referrerpolicy="no-referrer" />
 
 
-
   <!-- ----------------------------- sweet alert ----------------------------- -->
   <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <!-- CDN example (unpkg) -->
@@ -45,9 +44,9 @@
 
   <form class="nova-tarefa" id="formularioTarefa">
     <div class="not-done "></div>
-    <label>
-      <input id="inputTarefa" type="text" placeholder="Nova tarefa">
-      <span class="errorMsg">Obrigatório informar descrição da tarefa</span>
+    <label class="labeltarefa">
+      <input id="inputTarefa" type="text" placeholder="Nova tarefa" autocomplete="off">
+      <span class="errorMsg">Mínimo de 06 caracteres</span>
     </label>
     <button type="submit" id="btnCriar">
       <img src="./assets/plus.png" alt="Adicionar uma nova tarefa">

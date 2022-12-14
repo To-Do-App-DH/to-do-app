@@ -1,4 +1,5 @@
 @import url('./common.css');
+
 header {
   display: flex;
   background: linear-gradient(90deg, var(--primary), var(--secondary));
@@ -36,7 +37,7 @@ a {
   margin-left: .7em;
 }
 
-#closeApp{
+#closeApp {
   margin-left: 15px;
   font-size: .7em;
   background-color: rgb(218, 88, 88);
@@ -99,7 +100,7 @@ a {
   width: 100%;
 }
 
-.not-done {
+.not-done, .done{
   width: 2em;
   height: 2em;
   background-color: var(--app-grey);
@@ -108,6 +109,12 @@ a {
   cursor: pointer;
   text-align: center;
   color: grey;
+}
+
+.done {
+  background-color: var(--secondary);
+  
+  
 }
 
 /* Lista de tarefas ----------------------------------------------------------- */
@@ -207,11 +214,12 @@ a {
   margin: 2em 15%;
 }
 
-.tarefas-terminadas i{
+.tarefas-terminadas i {
   color: grey;
   background-color: rgb(228, 228, 228);
 }
-.tarefas-terminadas button{
+
+.tarefas-terminadas button {
   margin-left: 10px;
 }
 
@@ -224,47 +232,72 @@ a {
   text-decoration: line-through;
 }
 
-#skeleton .descricao{
+#skeleton .descricao {
   background-color: rgb(189, 189, 189);
 }
-#skeleton p{
+
+#skeleton p {
   background-color: rgb(214, 214, 214);
   color: rgb(214, 214, 214);
 }
-#skeleton .not-done{
+
+#skeleton .not-done {
   background-color: rgb(189, 189, 189);
 }
 
-#skeleton{
+#skeleton {
   animation: trasparencia 1s infinite;
 }
-.iconsTask{
+
+.iconsTask {
   padding: 8px;
 }
-#trash{
+
+#trash {
   padding: 4px;
   cursor: pointer;
 }
-#editar{
+
+#editar {
   padding: 4px;
   cursor: pointer;
 }
-#editar:hover{
-  transform:scale(1.2);
-  -webkit-transform:scale(1.2);
-  -moz-transform:scale(1.2);
-  -ms-transform:scale(1.2);
-  -o-transform:scale(1.2);
+
+#editar:hover {
+  transform: scale(1.2);
+  -webkit-transform: scale(1.2);
+  -moz-transform: scale(1.2);
+  -ms-transform: scale(1.2);
+  -o-transform: scale(1.2);
 }
-#trash:hover{
-  transform:scale(1.2) ;
-  -webkit-transform:scale(1.2) ;
-  -moz-transform:scale(1.2) ;
-  -ms-transform:scale(1.2) ;
-  -o-transform:scale(1.2) ;
+
+#trash:hover {
+  transform: scale(1.2);
+  -webkit-transform: scale(1.2);
+  -moz-transform: scale(1.2);
+  -ms-transform: scale(1.2);
+  -o-transform: scale(1.2);
 }
 
 @keyframes trasparencia {
-  0%{ opacity: 0.5;}
-  100%{ opacity: 0.8;}
+  0% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 0.8;
+  }
+}
+
+.labeltarefa {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 5px
+}
+
+
+.labeltarefa .errorMsg {
+  font-size: 12px;
+  color: red;
 }
